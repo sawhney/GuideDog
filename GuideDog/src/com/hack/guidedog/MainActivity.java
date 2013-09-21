@@ -1,15 +1,27 @@
 package com.hack.guidedog;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.os.Vibrator;
+import android.speech.RecognizerIntent;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.GestureDetector.OnDoubleTapListener;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.Menu;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -27,12 +39,13 @@ import com.hack.guidedog.msg.MessageActivity;
 public class MainActivity extends Activity implements GooglePlayServicesClient.ConnectionCallbacks,
 GooglePlayServicesClient.OnConnectionFailedListener {
     
+	private static final int VOICE_RECOGNITION_REQUEST_CODE = 1001;
 	private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 	private LocationClient mLocationClient;
 	private	Vibrator vibrator;
 	private Speaker speaker;
 	private LocationWeather locationWeather;
-	
+	private GestureDetector detector;
 	
 	private ImageView central;
 	private ImageView call;
@@ -55,6 +68,60 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 	private static float Y_MIN;
 	
 	private boolean flag;
+	private boolean flag1;
+	private boolean flag2;
+	
+	private GestureDetector.OnGestureListener listener = new OnGestureListener() {
+		
+		@Override
+		public boolean onSingleTapUp(MotionEvent e) {
+			// TODO Auto-generated method stub
+			System.out.println("single up");
+			return false;
+		}
+		
+		@Override
+		public void onShowPress(MotionEvent e) {
+			// TODO Auto-generated method stub
+			System.out.println("show");
+			
+		}
+		
+		@Override
+		public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+				float distanceY) {
+			// TODO Auto-generated method stub
+			System.out.println("scroll");
+			return false;
+		}
+		
+		@Override
+		public void onLongPress(MotionEvent e) {
+			// TODO Auto-generated method stub
+			System.out.println("Long Press");
+			vibrate();
+			flag2 = false;
+			if(checkCenter(e.getX(),e.getY())  && flag1)
+					speak();
+				
+		}
+		
+		@Override
+		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+				float velocityY) {
+			// TODO Auto-generated method stub
+			System.out.println("on fling");
+			return false;
+		}
+		
+		@Override
+		public boolean onDown(MotionEvent e) {
+			// TODO Auto-generated method stub
+			System.out.println("on down");
+			return false;
+		}
+	};
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +136,11 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		
 		speaker = new Speaker(this);
 		
+		detector = new GestureDetector(this,listener);
+		detector.setIsLongpressEnabled(true);
 		
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+	    StrictMode.setThreadPolicy(policy);
 		
 		DisplayMetrics metrics = getResources().getDisplayMetrics();
 		WIDTH = metrics.widthPixels;
@@ -86,7 +157,8 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		Y_MIN = (float)HEIGHT*(float)0.5-100;
 		
 		flag = false;
-		
+		flag1 = true;
+		flag2 = true;
 		
 		central = (ImageView) findViewById(R.id.central);
 		call = (ImageView) findViewById(R.id.call);
@@ -100,7 +172,9 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 
 	}
 	
+	
 	public boolean onTouchEvent(MotionEvent event) {
+		detector.onTouchEvent(event);
 		switch(event.getAction()) {
 		case MotionEvent.ACTION_UP :
 			central.setImageResource(R.drawable.central);
@@ -189,6 +263,10 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 	}
 	
 	private void centreClicked() {
+		if(!flag2) {
+			flag=true;
+			return;
+		}
 		central.setImageResource(R.drawable.central2);
 		String date = locationWeather.getDate();
 		speaker.speak(date);
@@ -225,8 +303,61 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		return result;
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// TODO Auto-generated method stub
+		if (requestCode == VOICE_RECOGNITION_REQUEST_CODE)
+			
+			if(resultCode == RESULT_OK) {
 	
+				ArrayList<String> textMatchList = data
+				.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 	
+				if (!textMatchList.isEmpty()) {
+				
+					if (textMatchList.get(0).contains("search")) {
+	
+						String searchQuery = textMatchList.get(0).replace("search",
+						" ");
+						Intent search = new Intent(Intent.ACTION_WEB_SEARCH);
+						search.putExtra(SearchManager.QUERY, searchQuery);
+						startActivity(search);
+					}
+					else 
+					{						
+						String search_text = textMatchList.get(0);
+						System.out.println(search_text);
+						Intent myIntent = new Intent(this, SearchResults.class);
+    	                myIntent.putExtra("SearchText", search_text);    	               
+    					startActivity(myIntent);
+									
+					}
+	
+				}
+			//Result code for various error.	
+			}
+			else if(resultCode == RecognizerIntent.RESULT_AUDIO_ERROR){
+				showToastMessage("Audio Error");
+			}
+			else if(resultCode == RecognizerIntent.RESULT_CLIENT_ERROR){
+				showToastMessage("Client Error");
+			}
+			else if(resultCode == RecognizerIntent.RESULT_NETWORK_ERROR){
+				showToastMessage("Network Error");
+			}
+			else if(resultCode == RecognizerIntent.RESULT_NO_MATCH){
+				showToastMessage("No Match");
+			}
+			else if(resultCode == RecognizerIntent.RESULT_SERVER_ERROR){
+				showToastMessage("Server Error");
+			}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+	
+	void showToastMessage(String message)
+	{
+		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+	}
 	
 //	@Override
 //	protected void onCreate(Bundle savedInstanceState) {
@@ -235,8 +366,36 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 ////		startService(new Intent(this, MainService.class));
 //		
 //	}
-
+	  public void checkVoiceRecognition() {
+			// Check if voice recognition is present
+			PackageManager pm = getPackageManager();
+			List<ResolveInfo> activities = pm.queryIntentActivities(new Intent(
+					RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
+			if (activities.size() == 0) {
+				flag1=false;
+				Toast.makeText(this, "Voice recognizer not present",
+						Toast.LENGTH_SHORT).show();
+			}
+		}
 	
+	  public void speak() {
+	    	
+			Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+			
+			intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getClass()
+					.getPackage().getName());
+
+			intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "");		
+			
+			intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+					RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
+			
+			int noOfMatches = 1;
+			
+			intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, noOfMatches);
+			startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
+		}
+	  
 	
 	private boolean checkPlayServices() {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
@@ -297,6 +456,8 @@ private void vibrate() {
 		// TODO Auto-generated method stub
 		System.out.println("disconnected");
 	}
+	
+	
 	
 	
 }

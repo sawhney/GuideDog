@@ -9,5 +9,6 @@
     <string name="title_activity_message">MessageActivity</string>
     <string name="title_activity_email">EmailActivity</string>
     <string name="title_activity_mail">MailActivity</string>
+    <string name="title_activity_search">SearchResults</string>
 
 </resources>
