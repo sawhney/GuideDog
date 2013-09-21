@@ -263,7 +263,6 @@ private void vibrate() {
 		// TODO Auto-generated method stub
 		System.out.println("connected");
 		locationWeather = new LocationWeather(this,mLocationClient);
-		
 	}
 
 	@Override
