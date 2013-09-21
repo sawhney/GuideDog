@@ -230,7 +230,7 @@ containing a value of this type.
         public static final int zero0=0x7f020048;
     }
     public static final class id {
-        public static final int action_settings=0x7f050024;
+        public static final int action_settings=0x7f050037;
         public static final int alarm=0x7f05000c;
         public static final int buttonAss=0x7f050021;
         public static final int buttonBack=0x7f050016;
@@ -253,6 +253,16 @@ containing a value of this type.
         public static final int editText_text=0x7f050008;
         public static final int editText_to=0x7f050006;
         public static final int hybrid=0x7f050004;
+        public static final int imageView1=0x7f050025;
+        public static final int imageView10=0x7f050036;
+        public static final int imageView2=0x7f050026;
+        public static final int imageView3=0x7f050028;
+        public static final int imageView4=0x7f05002a;
+        public static final int imageView5=0x7f05002c;
+        public static final int imageView6=0x7f05002e;
+        public static final int imageView7=0x7f050030;
+        public static final int imageView8=0x7f050032;
+        public static final int imageView9=0x7f050034;
         public static final int layout=0x7f05000a;
         public static final int mBtnSubmit=0x7f050009;
         public static final int mail=0x7f05000d;
@@ -263,10 +273,19 @@ containing a value of this type.
         public static final int not=0x7f050011;
         public static final int ocr=0x7f05000e;
         public static final int satellite=0x7f050002;
+        public static final int scrollView1=0x7f050024;
         public static final int settings=0x7f05000f;
         public static final int terrain=0x7f050003;
         public static final int textView1=0x7f050013;
+        public static final int textView10=0x7f050035;
         public static final int textView2=0x7f050014;
+        public static final int textView3=0x7f050027;
+        public static final int textView4=0x7f050029;
+        public static final int textView5=0x7f05002b;
+        public static final int textView6=0x7f05002d;
+        public static final int textView7=0x7f05002f;
+        public static final int textView8=0x7f050031;
+        public static final int textView9=0x7f050033;
     }
     public static final class layout {
         public static final int activity_mail=0x7f030000;
@@ -274,6 +293,7 @@ containing a value of this type.
         public static final int activity_message=0x7f030002;
         public static final int activity_phone=0x7f030003;
         public static final int activity_second=0x7f030004;
+        public static final int search_results=0x7f030005;
     }
     public static final class menu {
         public static final int email=0x7f090000;
@@ -369,6 +389,7 @@ containing a value of this type.
         public static final int title_activity_mail=0x7f06001c;
         public static final int title_activity_message=0x7f06001a;
         public static final int title_activity_phone=0x7f060019;
+        public static final int title_activity_search=0x7f06001d;
         public static final int title_activity_second=0x7f060018;
     }
     public static final class style {

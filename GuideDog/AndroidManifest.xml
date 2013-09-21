@@ -60,6 +60,10 @@
             android:name="com.hack.guidedog.email.MailActivity"
             android:label="@string/title_activity_mail" >
         </activity>
+        <activity
+            android:name="com.hack.guidedog.SearchResults"
+            android:label="@string/title_activity_search" >
+        </activity>
     </application>
 
 </manifest>
