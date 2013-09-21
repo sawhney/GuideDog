@@ -27,6 +27,9 @@ public void stop() {
 	tts.stop();
 }
 
+public void shutdown() {
+	tts.shutdown();
+}
 
 public void speak(String text) {
 	tts.speak(text, TextToSpeech.QUEUE_ADD, null);

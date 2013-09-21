@@ -3,6 +3,7 @@ package com.hack.guidedog;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
@@ -18,7 +19,10 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
+import com.hack.guidedog.call.PhoneActivity;
+import com.hack.guidedog.email.MailActivity;
 import com.hack.guidedog.info.LocationWeather;
+import com.hack.guidedog.msg.MessageActivity;
 
 public class MainActivity extends Activity implements GooglePlayServicesClient.ConnectionCallbacks,
 GooglePlayServicesClient.OnConnectionFailedListener {
@@ -122,9 +126,14 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 	
 	@Override
 	protected void onPause() {
-		// TODO Auto-generated method stub
 		speaker.stop();
 		super.onPause();
+	}
+	
+	@Override
+	protected void onDestroy() {
+		speaker.shutdown();
+		super.onDestroy();
 	}
 	
 	boolean checkCenter(float x, float y) {
@@ -148,19 +157,35 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		else if(result.equals("TOP LEFT"))
 			settings.setImageResource(R.drawable.settings2);
 		else if(result.equals("TOP"))
-			call.setImageResource(R.drawable.call2);
+			topClicked();
 		else if(result.equals("TOP RIGHT"))
-			msg.setImageResource(R.drawable.msg2);
+			topRightClicked();
 		else if(result.equals("LEFT"))
 			alarm.setImageResource(R.drawable.alarm2);
 		else if(result.equals("RIGHT"))		
-			mail.setImageResource(R.drawable.mail2);
+			rightClicked();
 		else if(result.equals("BOTTOM RIGHT"))
 			nfc.setImageResource(R.drawable.nfc2);
 		else if(result.equals("BOTTOM"))
 			ocr.setImageResource(R.drawable.ocr2);
 		else if(result.equals("BOTTOM LEFT"))
 			not.setImageResource(R.drawable.not2);
+	}
+	
+	private void rightClicked() {
+		speaker.speak("Send Email");
+		mail.setImageResource(R.drawable.mail2);
+		startActivity(new Intent(this, MailActivity.class));
+	}
+	private void topRightClicked() {
+		speaker.speak("Send Message");
+		msg.setImageResource(R.drawable.msg2);
+		startActivity(new Intent(this, MessageActivity.class));
+	}
+	private void topClicked() {
+		speaker.speak("Make a Call");
+		call.setImageResource(R.drawable.call2);
+		startActivity(new Intent(this, PhoneActivity.class));
 	}
 	
 	private void centreClicked() {
@@ -170,6 +195,8 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		String weather = locationWeather.getWeather();
 		if(weather!= null && !weather.startsWith("Error"))
 			speaker.speak(weather);
+		else
+			System.out.println(weather);
 		String location = locationWeather.getLocation();
 		if(location!= null && !location.startsWith("Error"))
 			speaker.speak(location);
