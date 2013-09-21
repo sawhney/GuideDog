@@ -47,7 +47,7 @@ public class MessageActivity extends Activity {
 	private static int count[];
 	private static String textInput ;
 	private static int keyPressed;
-	private static String[] pattern = {"11", "2abc", "3def", "4ghi", "5jkl", "6mno", "7pqrs", "8tuv", "9wxyz","","0 "};
+	private static String[] pattern = {"1.@,!", "2abc", "3def", "4ghi", "5jkl", "6mno", "7pqrs", "8tuv", "9wxyz","","0 "};
 	
 private View.OnClickListener listener = new View.OnClickListener() {
 		
@@ -86,8 +86,12 @@ private View.OnClickListener listener = new View.OnClickListener() {
 			case R.id.buttonOne:
 				buttonOne.setImageResource(R.drawable.one1);
 				keyPressed = 0;
+				if (!timer)
+            	{
+            		timer = true;  
+            		check();            		          		
+            	}
             	count[keyPressed]++;
-            	update_pattern();
 				break;
 			case R.id.buttonTwo:
 				buttonTwo.setImageResource(R.drawable.two2);
