@@ -10,5 +10,7 @@
     <string name="title_activity_email">EmailActivity</string>
     <string name="title_activity_mail">MailActivity</string>
     <string name="title_activity_search">SearchResults</string>
+    <string name="title_activity_alarm">AlarmActivity</string>
+    <string name="title_activity_nfc">NFCActivity</string>
 
 </resources>

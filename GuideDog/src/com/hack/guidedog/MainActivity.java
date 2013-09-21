@@ -31,6 +31,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
+import com.hack.guidedog.alarm.AlarmActivity;
 import com.hack.guidedog.call.PhoneActivity;
 import com.hack.guidedog.email.MailActivity;
 import com.hack.guidedog.info.LocationWeather;
@@ -227,7 +228,7 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 
 
 		if(result.equals("CENTRE"))
-			centreClicked();
+			System.out.println("centre");
 		else if(result.equals("TOP LEFT"))
 			settings.setImageResource(R.drawable.settings2);
 		else if(result.equals("TOP"))
@@ -235,15 +236,26 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		else if(result.equals("TOP RIGHT"))
 			topRightClicked();
 		else if(result.equals("LEFT"))
-			alarm.setImageResource(R.drawable.alarm2);
+			leftClicked();
 		else if(result.equals("RIGHT"))		
 			rightClicked();
 		else if(result.equals("BOTTOM RIGHT"))
-			nfc.setImageResource(R.drawable.nfc2);
+			bottomRightClicked();
 		else if(result.equals("BOTTOM"))
 			ocr.setImageResource(R.drawable.ocr2);
 		else if(result.equals("BOTTOM LEFT"))
-			not.setImageResource(R.drawable.not2);
+			bottomLeftClicked();
+			
+	}
+	
+	private void bottomRightClicked() {
+		nfc.setImageResource(R.drawable.nfc2);
+		startActivity(new Intent(this, NFCActivity.class));
+	}
+	private void leftClicked() {
+		speaker.speak("Set Alarm");
+		alarm.setImageResource(R.drawable.alarm2);
+		startActivity(new Intent(this,AlarmActivity.class));
 	}
 	
 	private void rightClicked() {
@@ -262,12 +274,8 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		startActivity(new Intent(this, PhoneActivity.class));
 	}
 	
-	private void centreClicked() {
-		if(!flag2) {
-			flag=true;
-			return;
-		}
-		central.setImageResource(R.drawable.central2);
+	private void bottomLeftClicked() {
+		not.setImageResource(R.drawable.not2);
 		String date = locationWeather.getDate();
 		speaker.speak(date);
 		String weather = locationWeather.getWeather();

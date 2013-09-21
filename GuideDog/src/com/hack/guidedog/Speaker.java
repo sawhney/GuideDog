@@ -24,10 +24,12 @@ public void onInit(int status) {
 }
 
 public void stop() {
+	if(tts!=null)
 	tts.stop();
 }
 
 public void shutdown() {
+	if(tts!=null)
 	tts.shutdown();
 }
 

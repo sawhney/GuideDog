@@ -46,7 +46,6 @@ import android.speech.tts.TextToSpeech.OnInitListener;
 
 public class SearchResults extends Activity {
 
-	Speaker speaker;
 	String input;
 	EditText text;
 	ImageView search;
@@ -55,19 +54,28 @@ public class SearchResults extends Activity {
 	TextView[] tv=new TextView[10];
 	ImageView[] im=new ImageView[10];
 	private int MY_DATA_CHECK_CODE = 0;
-	private TextToSpeech myTTS;	
-	TextToSpeech tts;
+	private TextToSpeech tts;	
 	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.search_results);
-		
-		speaker = new Speaker(this);
-		
+		setContentView(R.layout.search_results);		
 		Bundle extras = getIntent().getExtras(); 
 		input = extras.getString("SearchText");
+		
+		tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+			
+			@Override
+			public void onInit(int status) {
+				// TODO Auto-generated method stub
+				if(status!=TextToSpeech.ERROR){
+					tts.setLanguage(Locale.US);
+					doStuff();
+				}
+			}
+		} );
+	}
 	
 		/*
 		Intent checkIntent = new Intent();
@@ -86,7 +94,7 @@ public class SearchResults extends Activity {
 				
 			}
 		}); */
-		
+		private void doStuff() {
 		tv[0]=(TextView) findViewById(R.id.textView1);
 		tv[1]=(TextView) findViewById(R.id.textView2);
 		tv[2]=(TextView) findViewById(R.id.textView3);
@@ -135,22 +143,20 @@ public class SearchResults extends Activity {
             	
         }});
 		*/
-
-		
-		
-		
 	}
 	
 	
 	@Override
 	protected void onPause() {
-		speaker.stop();
+		if(tts!=null)
+			tts.stop();
 		super.onPause();
 	}
 	
 	@Override
 	protected void onDestroy() {
-		speaker.shutdown();
+	if(tts!=null)
+		tts.shutdown();
 		super.onDestroy();
 	}
 	
@@ -264,8 +270,8 @@ public class SearchResults extends Activity {
                      //   System.out.println("");
                     }
                 }
-                speaker.speak(str);
                 System.out.println(str);
+                tts.speak(str, TextToSpeech.QUEUE_FLUSH, null);
                 // We ignored many other types of Wolfram|Alpha output, such as warnings, assumptions, etc.
                 // These can be obtained by methods of WAQueryResult or objects deeper in the hierarchy.
             }
