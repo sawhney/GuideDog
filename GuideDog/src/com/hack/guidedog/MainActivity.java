@@ -8,20 +8,23 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.os.Vibrator;
 import android.speech.RecognizerIntent;
+import android.telephony.SmsManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
-import android.view.GestureDetector.OnDoubleTapListener;
 import android.view.GestureDetector.OnGestureListener;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -31,14 +34,19 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
+import com.hack.guidedog.NFC.NFCActivity;
 import com.hack.guidedog.alarm.AlarmActivity;
 import com.hack.guidedog.call.PhoneActivity;
 import com.hack.guidedog.email.MailActivity;
 import com.hack.guidedog.info.LocationWeather;
 import com.hack.guidedog.msg.MessageActivity;
+import com.hack.guidedog.ocr.CameraShot;
+import com.hack.guidedog.settings.SettingsActivity;
 
 public class MainActivity extends Activity implements GooglePlayServicesClient.ConnectionCallbacks,
 GooglePlayServicesClient.OnConnectionFailedListener {
+	
+	private boolean check = false;
     
 	private static final int VOICE_RECOGNITION_REQUEST_CODE = 1001;
 	private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
@@ -47,6 +55,12 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 	private Speaker speaker;
 	private LocationWeather locationWeather;
 	private GestureDetector detector;
+	
+	private StringBuilder code ;
+	private String currentString ;
+	
+	private String preset;
+	private String number;
 	
 	private ImageView central;
 	private ImageView call;
@@ -136,6 +150,12 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		    mLocationClient = new LocationClient(this, this, this);
 		
 		speaker = new Speaker(this);
+		
+		code = new StringBuilder();  
+		currentString = "";
+		SharedPreferences prefs = getSharedPreferences(SettingsActivity.PREF_NAME, MODE_PRIVATE);
+		number = prefs.getString(SettingsActivity.EMERGENCY_CONTACT_KEY,"");
+		preset = prefs.getString(SettingsActivity.PANIC_KEY,"");
 		
 		detector = new GestureDetector(this,listener);
 		detector.setIsLongpressEnabled(true);
@@ -230,7 +250,7 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		if(result.equals("CENTRE"))
 			System.out.println("centre");
 		else if(result.equals("TOP LEFT"))
-			settings.setImageResource(R.drawable.settings2);
+			topLeftClicked();
 		else if(result.equals("TOP"))
 			topClicked();
 		else if(result.equals("TOP RIGHT"))
@@ -242,12 +262,21 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		else if(result.equals("BOTTOM RIGHT"))
 			bottomRightClicked();
 		else if(result.equals("BOTTOM"))
-			ocr.setImageResource(R.drawable.ocr2);
+			bottomClicked();
 		else if(result.equals("BOTTOM LEFT"))
 			bottomLeftClicked();
 			
 	}
 	
+	private void topLeftClicked(){
+		settings.setImageResource(R.drawable.settings2);
+		startActivity(new Intent(this,SettingsActivity.class));
+	}
+	
+	private void bottomClicked() {
+		ocr.setImageResource(R.drawable.ocr2);
+		startActivity(new Intent(this, CameraShot.class));
+	}
 	private void bottomRightClicked() {
 		nfc.setImageResource(R.drawable.nfc2);
 		startActivity(new Intent(this, NFCActivity.class));
@@ -465,7 +494,73 @@ private void vibrate() {
 		System.out.println("disconnected");
 	}
 	
-	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		System.out.println("klsdjflksdjflkdjslfjasdl");
+		// TODO Auto-generated method stub
+		switch (keyCode) 
+		{
+		
+		case KeyEvent.KEYCODE_VOLUME_UP:
+			if (!check)
+			{
+				currentString = "";
+				check = true;
+				timer_check();
+			}
+			System.out.println("UP");
+			currentString = currentString +"1";
+			break;
+		
+		case KeyEvent.KEYCODE_VOLUME_DOWN:
+			System.out.println("DOWN");
+			currentString = currentString +"0";
+			break;
+		}
+		
+		
+		return super.onKeyDown(keyCode, event);
+	}
+	public void timer_check()
+	{
+		new Handler().postDelayed(new Runnable(){
+			@Override
+			public void run()
+			{
+				check_entered_pattern();
+			}
+		}, 3000);
+	}
+	public void check_entered_pattern()
+	{
+		System.out.println(currentString);
+		System.out.println("preset    "+ preset);
+
+		if (currentString.equals(preset))
+		{
+			panic_function();
+		}
+			currentString = "";
+	}
+	private void panic_function()
+	{
+		send_sms();
+		call_number();
+	}
+	private void send_sms()
+	{
+		SmsManager smsManager = SmsManager.getDefault();
+		smsManager.sendTextMessage(number, null, "Help me Please.   "+locationWeather.getLocation(), null, null);		
+	}
+	private void call_number()
+	{
+		String num = "tel:"+ number;
+		Intent callIntent = new Intent(Intent.ACTION_CALL);
+		callIntent.setData(Uri.parse(num));
+		startActivity(callIntent);
+		
+		
+	}
 	
 	
 }

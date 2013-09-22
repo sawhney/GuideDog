@@ -17,7 +17,7 @@ public class Monitor extends BroadcastReceiver {
 		} else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)){
 			System.out.println("Action_Screen_On");
 			Intent i = new Intent();
-	        i.setClassName("com.hack.guidedog", "com.hack.guidedog.SecondActivity");
+	        i.setClassName("com.hack.guidedog", "com.hack.guidedog.MainActivity");
 	        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 	        context.startActivity(i);
 		} else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {

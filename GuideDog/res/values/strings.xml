@@ -12,5 +12,9 @@
     <string name="title_activity_search">SearchResults</string>
     <string name="title_activity_alarm">AlarmActivity</string>
     <string name="title_activity_nfc">NFCActivity</string>
+    <string name="title_activity_ocr">OCRActivity</string>
+    <string name="title_activity_camera_shot">CameraShotActivity</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_splash_screen">GuideDog</string>
 
 </resources>

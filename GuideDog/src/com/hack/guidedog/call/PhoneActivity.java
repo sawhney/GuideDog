@@ -1,12 +1,18 @@
 package com.hack.guidedog.call;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
+import android.speech.RecognizerIntent;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -14,6 +20,7 @@ import android.view.WindowManager;
 import android.view.View.OnLongClickListener;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.hack.guidedog.R;
 import com.hack.guidedog.Speaker;
@@ -21,6 +28,9 @@ import com.hack.guidedog.Speaker;
 public class PhoneActivity extends Activity {	
 	
 	EditText input;	
+	
+	private static final int VOICE_RECOGNITION_REQUEST_CODE = 1001;
+	private boolean flag1 = true;
 	
 	private Speaker speaker;
 	private Vibrator vibrator;
@@ -200,8 +210,92 @@ private View.OnClickListener listener = new View.OnClickListener() {
 		buttonAss.setOnClickListener(listener);
 		buttonZero.setOnClickListener(listener);		
 		buttonHash.setOnClickListener(listener);
+		
+		buttonSpeak.setOnLongClickListener(new OnLongClickListener() {
+			
+			@Override
+			public boolean onLongClick(View v) {
+				// TODO Auto-generated method stub
+				if(flag1)
+					speak();
+				return true;
+			}
+		});
 	}
 
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// TODO Auto-generated method stub
+		if (requestCode == VOICE_RECOGNITION_REQUEST_CODE)
+			
+			if(resultCode == RESULT_OK) {
+	
+				ArrayList<String> textMatchList = data
+				.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+	
+				if (!textMatchList.isEmpty()) {
+				
+					input.setText(input.getText()+" "+textMatchList.get(0));
+	
+				}
+			//Result code for various error.	
+			}
+			else if(resultCode == RecognizerIntent.RESULT_AUDIO_ERROR){
+				showToastMessage("Audio Error");
+			}
+			else if(resultCode == RecognizerIntent.RESULT_CLIENT_ERROR){
+				showToastMessage("Client Error");
+			}
+			else if(resultCode == RecognizerIntent.RESULT_NETWORK_ERROR){
+				showToastMessage("Network Error");
+			}
+			else if(resultCode == RecognizerIntent.RESULT_NO_MATCH){
+				showToastMessage("No Match");
+			}
+			else if(resultCode == RecognizerIntent.RESULT_SERVER_ERROR){
+				showToastMessage("Server Error");
+			}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+	
+	void showToastMessage(String message)
+	{
+		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+	}
+	
+	 public void checkVoiceRecognition() {
+			// Check if voice recognition is present
+			PackageManager pm = getPackageManager();
+			List<ResolveInfo> activities = pm.queryIntentActivities(new Intent(
+					RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
+			if (activities.size() == 0) {
+				flag1=false;
+				Toast.makeText(this, "Voice recognizer not present",
+						Toast.LENGTH_SHORT).show();
+			}
+		}
+	
+	  public void speak() {
+	    	
+			Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+			
+			intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getClass()
+					.getPackage().getName());
+
+			intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "");		
+			
+			intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+					RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
+			
+			int noOfMatches = 1;
+			
+			intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, noOfMatches);
+			startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
+		}
+	
+
+	
 	@Override
 	protected void onPause() {
 		// TODO Auto-generated method stub
