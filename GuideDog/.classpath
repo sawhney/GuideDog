@@ -16,5 +16,6 @@
 	<classpathentry kind="lib" path="/Users/sahajsawhney/Desktop/httpcore-4.1.2.jar"/>
 	<classpathentry kind="lib" path="/Users/sahajsawhney/Desktop/httpmime-4.1.2.jar"/>
 	<classpathentry kind="lib" path="/Users/sahajsawhney/Desktop/WolframAlpha-1.1.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/tess-two"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
