@@ -80,6 +80,7 @@ public class SettingsActivity extends Activity {
 			@Override
 			public void run()
 			{
+				check=false;
 				check_entered_pattern();
 			}
 		}, 3000);

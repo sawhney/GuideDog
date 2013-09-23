@@ -352,7 +352,26 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 	
 				if (!textMatchList.isEmpty()) {
 				
-					if (textMatchList.get(0).contains("search")) {
+					if((textMatchList.get(0).contains("go")||textMatchList.get(0).contains("Go"))||textMatchList.get(0).contains("to")){
+						String[] s = textMatchList.get(0).split(" ");
+						for(String string: s)
+							if(string.equalsIgnoreCase("call")||string.equalsIgnoreCase("phone"))
+								startActivity(new Intent(this, PhoneActivity.class));
+							else if(string.equalsIgnoreCase("message"))
+								startActivity(new Intent(this, MessageActivity.class));
+							else if(string.equalsIgnoreCase("email")||string.equalsIgnoreCase("e mail"))
+								startActivity(new Intent(this, MailActivity.class));
+							else if(string.equalsIgnoreCase("N F C"))
+								startActivity(new Intent(this, NFCActivity.class));
+							else if(string.equalsIgnoreCase("O C R") || string.equalsIgnoreCase("sight"))
+								startActivity(new Intent(this, CameraShot.class));
+							else if(string.equalsIgnoreCase("notification")||string.equalsIgnoreCase("notifications"))
+								bottomLeftClicked();
+							else if(string.equalsIgnoreCase("setting")||string.equalsIgnoreCase("settings"))
+								startActivity(new Intent(this,SettingsActivity.class));
+							else if(string.equalsIgnoreCase("alarm")||string.equalsIgnoreCase("alarms"))
+								startActivity(new Intent(this,AlarmActivity.class));
+					} else if (textMatchList.get(0).contains("search")) {
 	
 						String searchQuery = textMatchList.get(0).replace("search",
 						" ");
@@ -527,6 +546,7 @@ private void vibrate() {
 			@Override
 			public void run()
 			{
+				check=false;
 				check_entered_pattern();
 			}
 		}, 3000);
